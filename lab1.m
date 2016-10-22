@@ -1,104 +1,174 @@
 function lab1()
-y = Dirac(10, 20);
+
+%Answer for Question 1.1
+d = Dirac(10, 20);
 figure(1); 
-stem(y);  title('Dirac Function');
+stem(d);  title('Dirac Function');
 
-z =Step(10,20);
+%Answer for Question 1.2
+
+s =Step(10,20);
 figure(2); 
-stem(z); title ('Step Function');
+stem(s); title ('Step Function');
 
-e = Ramp(10,20);
+%Answer for Question 1.3
+
+r = Ramp(0,20);
 figure(3); 
-stem(e); title ('Step Function');
+stem(r); title ('Ramp Function');
 
+%Answer for Question 1.4
 
+g = Geo(2, 10, 20);
+figure(4); 
+stem(g); title ('Geometric Function');
 
+%Answer for Question 1.5
 
-end
+b = Box(2, 18, 20);
+figure(5); 
+stem(b); title ('Box Function')
 
+%Answer for Question 1.6
 
-function y = Dirac(n, N)
+[t, sf] = Sinfn(10, 1, 100);
+figure(6); 
+stem(t,sf); title ('Sin Function 1')
 
-if  n >= (N-1)
-    disp('Value not in range ');
-   
-else
+[k, sf] = Sinfn(10, 2, 1000);
+figure(7); 
+stem(k,sf); title ('Sin Function 2')
 
+i=1/30;
+[oo, sf] = Sinfn(10, 2, 30);
+figure(8); 
+stem(oo,sf); 
+title ('Sin Function 3')
 
-arr = zeros(1,N, 'uint32');
-
-arr(n+1) = 1; 
-y = arr;
-
-end
-end
-
-function y = Step(n, N)
-
-if  n >= (N-1)
-    disp('Value not in range ');
-    
-else
-
-
-arr = zeros(1,N, 'uint32');
-
-
-for a = n+1:N 
-    arr(a) = 1;   
-end
+%Answer for Question 2.1
+g1 = Gaussian(1000);
  
-y = arr;
+g2 = Gaussian(10000);
+
+%Answer for Question 2.2
+
+u1 = Uniform(1000);
+
+u2 = Uniform(10000);
+
+%Answer for Question 2.3
+
+u3 = xcorr(g1);
+
+figure;
+plot(u3);
+title('AC of Gaussian Dist Functions with 1000 elements')
+figure;
+u4 = xcorr(g2);
+plot(u4);
+title('AC of Gaussian Dist Functions with 10000 elements')
+
+
+u3 = xcorr(u1);
+figure;
+plot(u3);
+title('AC of Uniform Dist Functions with 1000 elements')
+u4 = xcorr(u2);
+figure;
+plot(u4);
+title('AC of Uniform Dist Functions with 10000 elements')
+
+
+
+% Answer to Question 2.4
+
+%Generating three binary random signals
+
+s1 = round(rand(1,50));
+s2 = round(rand(1,50));
+s3 = round(rand(1,50));
+
+% n, m and o, respectively, are the shifts in the three signals
+n=50;
+m=150;
+o=250;
+
+
+%Introducing shift (n, m or o) in the respective signals
+
+a1 = zeros(1,400);
+a2 = zeros(1,400);
+a3 = zeros(1,400);
+
+
+k=1;
+
+for i = n:n+49
+a1(i) = s1(k);
+k=k+1;
 end
+
+k=1;
+
+for i = m:m+49
+a2(i) = s2(k);
+k=k+1;
 end
 
-function y = Ramp(n, N)
+k=1;
+
+for i = o:o+49
+a3(i) = s3(k);
+k=k+1;
+end
+
+%Plotting the three signals
+t= 1:1:400;
+stem(t,a1);
+title('a1');
+figure;
+
+stem(t,a2);
+title('a2');
+figure;
+
+stem(t,a3);
+title('a3');
 
 
-t= n+1:1:N;
-size(t);
+% Combining the three signals to make "cs" signal
+cs = a1 + a2 + a3;
+figure;
+stem(t,cs);
+title('Whole Signal S');
+
+%Calculation the Cross-Correlations of s1, s2 and s3 with cs
+r1 = xcorr(cs,s1);
+r2 = xcorr(cs,s2);
+r3 = xcorr(cs,s3);
+
+plot(r1); figure;
+plot(r2); figure;
+plot(r3);
 
 
-if  n >= (N-1)
-    Disp('Value not in range ');
-    return
+
+
 end
 
 
-arr = zeros(1,N, 'double');
 
 
-for a = n+1:N 
-    arr(a) = 1;
-    
-end
 
 
-for a = n+2:N 
-    arr(a) = arr(a-1) + arr(a);
-    
-end
- 
-y = arr;
-
-end
 
 
-function y = Step(n, N)
-
-if  n >= (N-1)
-    disp('Value not in range ');
-    
-else
 
 
-arr = zeros(1,N, 'uint32');
 
 
-for a = n+1:N 
-    arr(a) = 1;   
-end
- 
-y = arr;
-end
-end
+
+
+
+
+
