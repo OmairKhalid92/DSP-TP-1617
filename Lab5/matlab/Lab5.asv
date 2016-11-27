@@ -1,0 +1,220 @@
+%1.1 - Creating a synthetic image
+
+% img = zeros(301,301);
+% img(100:200, 140:160) = 255;
+% figure;
+% imshow(img);
+% title('Original Image')
+% 
+% %1.2 - Computing FFT
+% 
+% imgFreq = fftshift(fft2(img));
+% figure;
+% 
+% subplot(121); imagesc(abs(imgFreq)); colormap('default'); title('Magnitude')
+% subplot(122); imagesc(angle(imgFreq)/pi*180); colormap('default'); title('Phase')
+
+%1.3 - Computing FFT after translating and rotating
+
+% img = zeros(301,301);
+% img(100:200, 140:160) = 255;
+% figure;
+% imshow(img);
+
+% %Translated Image
+% imgTrans = zeros(301,301);
+% imgTrans(150:250, 160:180) = 255;
+% figure;
+% imshow(imgTrans);
+% title('Translated Image')
+% 
+% 
+% imgFreqT = fftshift(fft2(imgTrans));
+% figure;
+% subplot(121); imagesc(abs(imgFreqT)); colormap('default'); title('Magnitude')
+% subplot(122); imagesc(angle(imgFreqT)/pi*180); colormap('default'); title('Phase')
+
+
+
+% %Rotated Image
+% imgRot = imrotate(img, 45)
+% 
+% figure;
+% imshow(imgRot);
+% title('Rotated Image')
+% 
+% imgFreqR = fftshift(fft2(imgRot));
+% figure;
+% subplot(121); imagesc(abs(imgFreqR)); colormap('default'); title('Magnitude')
+% subplot(122); imagesc(angle(imgFreqR)/pi*180); colormap('default'); title('Phase')
+
+% 
+% 
+%Two Vert Rect Image
+
+% 
+% img2 = zeros(301,301);
+% img2(20:120, 140:160) = 255;
+% img2(180:280, 140:160) = 255;
+% 
+% figure;
+% 
+% imshow(img2); 
+% title('Two Vert Rect Image')
+% imgFreq2 = fftshift(fft2(img2));
+% figure; title('Freq Response of Two Vert Rect Image')
+% subplot(121); imagesc(abs(imgFreq2)); colormap('default'); title('Magnitude')
+% subplot(122); imagesc(angle(imgFreq2)/pi*180); colormap('default'); title('Phase')
+% 
+% % 
+% % %Thin Rect Image
+% 
+% 
+% img3 = zeros(301,301);
+% img3(100:200, 145:155) = 255;
+% figure;
+% imshow(img3);title('Thin Rect Image')
+% 
+% imgFreqth = fftshift(fft2(img3));
+% figure; 
+% subplot(121); imagesc(abs(imgFreqth)); colormap('default'); title('Magnitude')
+% subplot(122); imagesc(angle(imgFreqth)/pi*180); colormap('default');
+% title('Phase')
+% % 
+
+%%Comparing Original Image and Translated Image: Translation effects
+%%Magnitude, not the Phase 
+
+%%Comparing Original Image and Rotated Image: Rotation effects
+%%Magnitude and Phase
+
+%%Comparing Original Image and Two Vert Rect Image: As the image contains a
+%%pattern, we can see that the magnitude becomes more.
+
+%%Comparing Original Image and Thin Rect Image: The Mag response of thinner
+%%but longer iamge spreads across more frequencies but phase response
+%%remains the same
+
+
+%%1.4 - Another Synthetic Image
+
+Im=0;
+N=64;
+T=1;
+Ts=T/N;
+Fs=1/Ts;
+df=Fs/N;
+Im(N/8:N/4,N/4+1:N/2)=1;
+Im(1:N/4,N/2+1:N)=Im;
+Im(N/4+1:N/2,:) = Im;
+Im(N/2+1:3*N/4,:) = Im(1:N/4,:);
+Im(3*N/4+1:N,:) = Im(1:N/4,:);
+
+figure;imshow(Im)
+
+%Frequency Response
+
+imgFreqs = fftshift(fft2(Im));
+figure; 
+subplot(121); imagesc(abs(imgFreqs)); colormap('default'); title('Magnitude')
+subplot(122); imagesc(angle(imgFreqs)/pi*180); colormap('default');
+title('Phase')
+
+%Centralized Normal Frequency
+I = abs(imgFreqs((N/2)+1,(N/2)+1))/(64*64);
+
+
+
+%%1.5 - Freq Reponse of the Horiontal and Vertical slices at the centered
+%%freq
+
+t = linspace(-N/2, N/2-1, 1);
+t = -N/2:1:N/2-1;
+figure; 
+subplot(121); plot(t,abs(imgFreqs(N/2+1,:)));  title('Hor');
+subplot(122); plot(t,abs(imgFreqs(:,N/2+1))); title('Vert');
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Discuss the observation
+
+
+%%1.6 Loading Lena
+
+%Reading and showing Lena's Image
+I = imread('E:\VIBOT\DSP\DSP LAB 1\DSP-TP-1617\Lab5\images\lena-grey.bmp');
+figure;
+imshow(I);
+
+
+
+imgFreql = fftshift(fft2(I));
+figure; 
+subplot(121); imagesc(abs(imgFreql)); colormap('default'); title('Magnitude')
+subplot(122); imagesc(angle(imgFreql)/pi*180); colormap('default');
+title('Phase')
+
+%imglena= ifft2(I);
+%figure;imshow(imglena);
+
+
+imgFreq = (fft2(I));
+
+%Reconstructiong image from the FFT first using magnitude and then phase
+mag_I=abs(imgFreq);
+phase_I=angle(imgFreq);
+%performing ifftm to get back the image
+ifft_mag=ifftshift(ifft2(mag_I)); %reconstruction with magnitude
+ifft_phase=ifft2(exp(1i*phase_I));%reconstruction 
+figure();
+imshow(ifft_mag, []);
+title('Recovered Lena from Magnitude');
+figure();
+imshow(ifft_phase,[]);
+title('Recovered Lena from Phase');
+ 
+
+%1.7
+
+sobel_filter_matrix=[-1 0 1; -2 0 2; -1 0 1];
+%determining the size of lena and the sobel filter matrix
+image_size = size(lena);
+matrix_size = size(sobel_filter_matrix);
+%finding the size of the padding required by adding the image size and
+%matrix size and substracting 1
+padding_size = image_size + matrix_size - 1;
+
+
+%calculating the DFt of the two matrix
+dft_lena = fft2(double(lena), padding_size(1), padding_size(2));
+dft_sobel_matrix = fft2(double(sobel_filter_matrix), padding_size(1), padding_size(2));
+
+%fourier space multiplication
+multiplied_dft = dft_sobel_matrix.*dft_lena;
+inverse_fft = ifft2(multiplied_dft);
+%cropping to original size
+inverse_fft = inverse_fft(2:size(lena,1)+1, 2:size(lena,2)+1);
+
+figure;
+imshow(inverse_fft,[]);%displaying final output
+
+
+
+%filtering in spatial domain.sobel is odd filter. preperties of odd filer
+%in freq doman. 
+% Multiplicaiton of dft of image and dft of filter
+% pad because of periodicity in dft (add jsut one more row of zero)
+% 
+% Move filter in the center
+% check python notebook 
+% 
+% read page 237 - 255 from Gonzalez book
+% 
+% 
+% 
+% 
+% 
+% 
+
+
+
+
+
